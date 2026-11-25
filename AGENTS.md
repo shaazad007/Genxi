@@ -62,3 +62,11 @@ When stuck, stop and output:
 ## 10. Output Discipline
 - Keep progress messages short. No long summaries after each step.
 - Do not paste full logs; quote only the relevant error lines.
+
+# Genxi repository boundaries
+
+- Use `GENXI_PLAN.md` and `genxi-dashboard.html` as the project task plan and status mirror. Task records and append-only history live in `AI_WORKSPACE/`; that folder is governance only, never application runtime code.
+- `engine/` contains the imported private Node.js worker. `app/`, `control-api/`, provider adapters, `infra/`, and `tests/` are organized by their task-specific READMEs; placeholders are not implementations.
+- The root Kotlin/Gradle starter files are not the planned Flutter app. Preserve them until an authorized task explicitly replaces or removes them; the Flutter app is created under `app/`.
+- Keep credentials in ignored local environment files or GitHub Secrets. Commit only `.env.example` placeholders. Never add a live workflow before its source/security audit and task authorization; Google Cloud provisioning requires explicit owner opt-in.
+- Follow the existing backup, task-record, validation and reporting requirements before any implementation. Never run the engine in live mode or perform Shopify writes without explicit authorization.

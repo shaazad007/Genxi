@@ -1,6 +1,6 @@
 # Genxi — Hybrid SEO Automation Build Plan
 
-**Revision:** 2026-11-25 | **Status:** planning; T039 source audit complete; application implementation not started | **Initial worker:** GitHub Actions | **Future worker:** Google Cloud + Firebase
+**Revision:** 2026-11-25 | **Status:** T039 audit, T040 private engine import and T001 repository foundation complete; Flutter app/control API implementation not started | **Initial worker:** GitHub Actions | **Future worker:** Google Cloud + Firebase
 
 Genxi is an independent Flutter Shopify app for Pakistani clothing brands. It reads product images with Gemini Vision, combines them with owner checkbox input (gala, daaman, sleeve embroidery, dupatta, trouser), generates English SEO and publishes approved changes to Shopify. Reuse AutoGenSEO source where appropriate; do not modify its existing repository or production data.
 
@@ -13,7 +13,7 @@ Genxi is an independent Flutter Shopify app for Pakistani clothing brands. It re
 
 ## 2. Independent identity and source migration
 
-- Source: https://github.com/shaazad007/AutogenSeo (main). Target: proposed private `shaazad007/Genxi` (not created by this revision). Proposed Flutter package/project `genxi`; Android application ID `com.genxi.app` subject to availability; separate Shopify app/client ID, redirect URL, signing, brand assets, environments, GitHub secrets, Firebase project and GCP service accounts.
+- Source: https://github.com/shaazad007/AutogenSeo (main). Target: private `shaazad007/Genxi` (created; T040 Done). Proposed Flutter package/project `genxi`; Android application ID `com.genxi.app` subject to availability; separate Shopify app/client ID, redirect URL, signing, brand assets, environments, GitHub secrets, Firebase project and GCP service accounts.
 - Audit source and record exact commit SHA, license and attribution before copying. Duplicate complete reusable source into a new repository; do not use the old repo as runtime dependency. Prefer a clean initial commit, excluding credentials, `.env`, production data, old queue/history, caches, artifacts and private shop identifiers; preserve required license notices. Keep inherited Actions disabled until Genxi preview tests pass. Do not push to or change AutoGenSEO.
 - Current inspected source: https://github.com/shaazad007/AutogenSeo/blob/main/.github/workflows/auto-process.yml (blob SHA `0025684bf7905efd88a8b11e25b94a71e28203ac`, inspected 2026-11-25). Node 20, `index.js`, modes preview/live/profile-backfill/collections/enqueue/queue-worker, collection handles, request/logical IDs and publication range, serialized runs, progress/queue commits and safe rebase. Current schedule is 03:00, 09:00, 15:00, 21:10 UTC (08:00, 14:00, 20:00, 02:10 PKT); scheduled source run is profile-backfill, NOT general SEO. Source default manual limit is 10; scheduled backfill requests 100000 with time budget; do not copy that cap or timeout blindly. Genxi defaults to preview and configurable small batches.
 - Existing chat history describes shared Vision/SEO generation, `ai-done`, sequential collections, Gemini → Groq → Cloudflare Workers AI fallback and queue dedupe. Re-audit actual code before reuse; no claim of current verified full engine or metafield schema. Map metafield namespace/key to Genxi explicitly; avoid changing existing store fields without approval.
@@ -71,12 +71,12 @@ Both adapters → same portable Node.js worker → AI providers → approved Sho
 
 ## 6. Agent rules and acceptance
 
-- Follow this file and `genxi-dashboard.html`. Preserve original T001–T038 IDs; new T039–T061 add source migration and hybrid DevOps. Existing descriptions/dependencies changed where necessary for remote operation and safety. T039 is complete as a source audit only; no application code has been copied or implemented.
+- Follow this file and `genxi-dashboard.html`. Preserve original T001–T038 IDs; new T039–T061 add source migration and hybrid DevOps. Existing descriptions/dependencies changed where necessary for remote operation and safety. T039 audit, T040 private engine import and T001 repository foundation are complete; product-level Flutter app and control API implementation have not started.
 - Model labels carried from original (Luna Medium/High, Sol 5.6 Medium) are historical assignment labels, not guaranteed available model IDs; select available equivalents. Report Roman Urdu; code/comments English.
 - On `Task Txxx shuru karo`, read plan, verify dependencies Done, inspect repo/AGENTS.md, implement, test and record evidence. Pending = not started/blocked; Implemented = code written but unverified; Done = verified acceptance. Update both files in same commit; no fabricated status. Do not deploy, enable billing, publish live products or change original repo without appropriate owner approval.
 - Stage A acceptance: independent Genxi identity and repo, GitHub preview and approved live test, durable queue/resume/tenant isolation, review/publish, cost guard and webhook tests. Stage B acceptance: both providers same contract, migrated authoritative state, switch both directions, interruption recovery, no duplicate publish, shared usage limits and no uncontrolled charges. Phase 8 is deliberately deferred until owner opts in; GitHub launch does not depend on Cloud readiness.
 
-**Next task:** T040 Done. Private repository `shaazad007/Genxi` contains the verified migration at commit `7e74aff30ccc45e858e08536c967b8f23e1deb37`; no inherited workflow is present. T041 is the next Pending task and has not been started. The user directed this session to ignore `MASTER_WORKFLOW.md`; no numeric stage or transition is asserted. Pre-implementation backup `backups/SOURCE_BACKUP_2026-11-25_15-45-59_BEFORE_T040_REPO_IMPORT.zip` verified 23/23 entries. Do not automatically advance stages.
+**Next task:** T001 Done. Repository foundation and static acceptance checks are recorded in `AI_WORKSPACE/T001_TASK_RECORD.md`; pre-implementation backup verified 44/44 entries. T041 is Pending and has not been started. The user directed this session to ignore `MASTER_WORKFLOW.md`; no numeric stage or transition is asserted. Do not automatically advance stages.
 
 ## 7. Phases and tasks
 
@@ -84,7 +84,7 @@ Both adapters → same portable Node.js worker → AI providers → approved Sho
 
 | ID | Task | Model | Level | Depends on | Status |
 |---|---|---|---|---|---|
-| T001 | Genxi repo structure, README, environment template and AGENTS.md | Luna | Medium | T040 | Pending |
+| T001 | Genxi repo structure, README, environment template and AGENTS.md | Luna | Medium | T040 | Done |
 | T002 | Create independent Genxi Shopify app; validate distribution and scopes | Luna | Medium | T041 | Pending |
 | T003 | Portable Node.js control API and health endpoint; local HTTPS pilot gateway | Luna | Medium | T001, T042 | Pending |
 | T004 | Server-only secrets, encrypted token vault and redacted logging | Luna | High | T003 | Pending |

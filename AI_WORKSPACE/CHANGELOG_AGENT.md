@@ -39,3 +39,9 @@
 
 - Pushed commit `7e74aff30ccc45e858e08536c967b8f23e1deb37` to private `https://github.com/shaazad007/Genxi` on `main`.
 - Verified repository privacy, matching local/remote HEAD, and no inherited `.github/workflows` in the recursive remote tree. T040 marked Done; T041 remains Pending and unstarted. No phase advanced.
+
+## 2026-11-25 — T001 repository foundation
+
+- Added module scaffold READMEs, Genxi quickstart and placeholder-only `.env.example`; linked the quickstart from the root README and documented repo boundaries in AGENTS.md.
+- Added root/engine local `.env` ignore rules. Synchronized T001 Done in plan/dashboard after static acceptance checks; no application runtime or workflow added.
+- Tests/builds not run. Evidence and file inventory are in `AI_WORKSPACE/T001_TASK_RECORD.md`.

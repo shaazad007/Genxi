@@ -2,6 +2,10 @@
 
 This README is the common entry point for any project managed with AI coding agents (Codex, ChatGPT or other development agents). Keep it in the project root. Project-specific requirements, architecture, task IDs and technology choices belong in the project plan, not in this universal file.
 
+## Genxi project setup
+
+For this repository's current modules, environment variables and safe preview instructions, see [Genxi Quick Start](docs/QUICKSTART.md). The canonical plan is [GENXI_PLAN.md](GENXI_PLAN.md), with task status mirrored in [genxi-dashboard.html](genxi-dashboard.html).
+
 ## 1. Standard project control files
 
 | File | Purpose |

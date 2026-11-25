@@ -52,3 +52,18 @@
 - Pushed `7e74aff30ccc45e858e08536c967b8f23e1deb37` to `https://github.com/shaazad007/Genxi` branch `main`. GitHub reports the repository is private; recursive remote tree matches the imported files and contains no inherited `.github/workflows`; local and remote HEAD hashes match.
 - Updated: `GENXI_PLAN.md`, `genxi-dashboard.html`, `AI_WORKSPACE/T040_TASK_RECORD.md`, `AI_WORKSPACE/NEXT_TASK.md`, `AI_WORKSPACE/DECISIONS.md`, `AI_WORKSPACE/ISSUES.md`, `AI_WORKSPACE/CHANGELOG_AGENT.md`, `AI_WORKSPACE/ACTIVITY_LOG.md`. Deleted: none.
 - T040 marked Done; T041 is Pending and not started. No numeric stage or transition asserted. Tests/builds not run.
+
+## 2026-11-25 — T001 repository foundation
+
+- Phase 1 task T001 started by user; T040 dependency verified Done. Created verified pre-implementation ZIP `backups/SOURCE_BACKUP_2026-11-25_16-40-46_BEFORE_TASK-T001_REPO_FOUNDATION.zip` (93,021 bytes, 44 entries) and verified all entry hashes.
+- Created documented module scaffold for `app/`, `control-api/`, `adapters/github/`, `adapters/gcp/`, `infra/`, `tests/` and `docs/`; added root Genxi quickstart link, `docs/QUICKSTART.md`, and `.env.example` with placeholders only. Updated AGENTS boundaries and `.gitignore` for root/engine `.env`.
+- Created and verified second ZIP before task-status synchronization: `backups/SOURCE_BACKUP_2026-11-25_16-46-58_BEFORE_TASK-T001_STATUS_SYNC.zip` (98,294 bytes, 53 entries, all SHA-256 hashes match).
+- Validation: 8 scaffold/docs paths exist; all 4 required and 5 optional configuration variables are represented; values are placeholders; local `.env` files are ignored and `.env.example` remains trackable; README link resolves; no workflows added. Tests/builds not run.
+- Created: `.env.example`, `docs/QUICKSTART.md`, `app/README.md`, `control-api/README.md`, `adapters/github/README.md`, `adapters/gcp/README.md`, `infra/README.md`, `tests/README.md`, `AI_WORKSPACE/T001_TASK_RECORD.md`.
+- Modified: `README.md`, `AGENTS.md`, `.gitignore`, `GENXI_PLAN.md`, `genxi-dashboard.html`, `AI_WORKSPACE/NEXT_TASK.md`, `AI_WORKSPACE/DECISIONS.md`, `AI_WORKSPACE/CHANGELOG_AGENT.md`, `AI_WORKSPACE/ACTIVITY_LOG.md`, `AI_WORKSPACE/T001_TASK_RECORD.md`. Deleted: none.
+- T001 marked Done; T041 remains Pending and unstarted. No numeric stage or transition asserted.
+
+## 2026-11-25 — T001 final record snapshot
+
+- Before correcting the next-task Git-history reference, created and verified `backups/SOURCE_BACKUP_2026-11-25_16-50-22_BEFORE_TASK-T001_FINAL_RECORD.zip` (99,533 bytes, 53 entries; every entry SHA-256 matched source; excluded caches, local secrets and backup archives).
+- Updated `AI_WORKSPACE/T001_TASK_RECORD.md` and `AI_WORKSPACE/NEXT_TASK.md`. No application files changed. T041 remains Pending; no stage transition asserted.
