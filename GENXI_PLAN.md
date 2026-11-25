@@ -76,7 +76,7 @@ Both adapters → same portable Node.js worker → AI providers → approved Sho
 - On `Task Txxx shuru karo`, read plan, verify dependencies Done, inspect repo/AGENTS.md, implement, test and record evidence. Pending = not started/blocked; Implemented = code written but unverified; Done = verified acceptance. Update both files in same commit; no fabricated status. Do not deploy, enable billing, publish live products or change original repo without appropriate owner approval.
 - Stage A acceptance: independent Genxi identity and repo, GitHub preview and approved live test, durable queue/resume/tenant isolation, review/publish, cost guard and webhook tests. Stage B acceptance: both providers same contract, migrated authoritative state, switch both directions, interruption recovery, no duplicate publish, shared usage limits and no uncontrolled charges. Phase 8 is deliberately deferred until owner opts in; GitHub launch does not depend on Cloud readiness.
 
-**Next task:** T040 remains Pending and active. The private empty target repository and authenticated owner account are verified; the user directed this session to ignore `MASTER_WORKFLOW.md`, and `DEVELOPMENT_RULES.md` is available. No stage transition is asserted. Pre-implementation backup `backups/SOURCE_BACKUP_2026-11-25_15-45-59_BEFORE_T040_REPO_IMPORT.zip` verified 23/23 entries. Do not automatically advance stages.
+**Next task:** T040 Done. Private repository `shaazad007/Genxi` contains the verified migration at commit `7e74aff30ccc45e858e08536c967b8f23e1deb37`; no inherited workflow is present. T041 is the next Pending task and has not been started. The user directed this session to ignore `MASTER_WORKFLOW.md`; no numeric stage or transition is asserted. Pre-implementation backup `backups/SOURCE_BACKUP_2026-11-25_15-45-59_BEFORE_T040_REPO_IMPORT.zip` verified 23/23 entries. Do not automatically advance stages.
 
 ## 7. Phases and tasks
 
@@ -90,7 +90,7 @@ Both adapters → same portable Node.js worker → AI providers → approved Sho
 | T004 | Server-only secrets, encrypted token vault and redacted logging | Luna | High | T003 | Pending |
 | T005 | Genxi design tokens, app ID and white/green UI | Luna | Medium | T001, T040 | Pending |
 | T039 | Audit AutoGenSEO source, pin upstream commit, record license/provenance | Luna | Medium | - | Done |
-| T040 | Create separate private Genxi repository; copy source only, disable inherited workflows; reset identity | Luna | High | T039 | Implemented |
+| T040 | Create separate private Genxi repository; copy source only, disable inherited workflows; reset identity | Luna | High | T039 | Done |
 | T041 | Audit inherited secrets, shop IDs, history, data, workflows and package identifiers | Luna | High | T040 | Pending |
 | T042 | Extract portable engine and execution/state adapter interfaces | Luna | High | T001, T041 | Pending |
 
