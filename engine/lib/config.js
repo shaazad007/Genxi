@@ -1,0 +1,78 @@
+"use strict";
+
+const fs = require("fs");
+const path = require("path");
+
+// Load .env for local runs only. In GitHub Actions the secrets are already
+// present as real environment variables, so this is a harmless no-op there.
+try {
+  require("dotenv").config();
+} catch (e) {
+  // dotenv not installed / not needed — fine in CI.
+}
+
+const ROOT = path.resolve(__dirname, "..");
+
+function readJson(fileName, fallback) {
+  const filePath = path.join(ROOT, fileName);
+  if (!fs.existsSync(filePath)) return fallback;
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch (err) {
+    throw new Error(`Could not parse ${fileName}: ${err.message}`);
+  }
+}
+
+function requireEnv(name) {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(
+      `Missing required environment variable: ${name}. ` +
+        `Set it in your .env file locally, or as a GitHub Actions secret.`
+    );
+  }
+  return value;
+}
+
+function optionalEnv(name) {
+  return process.env[name] || null;
+}
+
+const promptConfig = readJson("config.json", {});
+const designers = readJson("designers.json", []);
+const models = readJson("models.json", []);
+
+const env = {
+  SHOPIFY_STORE: requireEnv("SHOPIFY_STORE"),
+  SHOPIFY_CLIENT_ID: requireEnv("SHOPIFY_CLIENT_ID"),
+  SHOPIFY_CLIENT_SECRET: requireEnv("SHOPIFY_CLIENT_SECRET"),
+  GEMINI_API_KEY: requireEnv("GEMINI_API_KEY"),
+  // Optional second provider in the Gemini -> Groq -> Cloudflare fallback chain.
+  GROQ_API_KEY: optionalEnv("GROQ_API_KEY"),
+  // Optional third vision provider. Both values must be set to enable fallback.
+  CLOUDFLARE_API_TOKEN: optionalEnv("CLOUDFLARE_API_TOKEN"),
+  CLOUDFLARE_ACCOUNT_ID: optionalEnv("CLOUDFLARE_ACCOUNT_ID"),
+  // Live profile generation/writes stay off unless an owner explicitly opts in.
+  AI_DESIGN_PROFILE_ENABLED: optionalEnv("AI_DESIGN_PROFILE_ENABLED") === "true",
+  // Normal live/queue/scheduled profile generation and writes are opt-in.
+  AI_DESIGN_PROFILE_LIVE_ENABLED: optionalEnv("AI_DESIGN_PROFILE_LIVE_ENABLED") === "true",
+};
+
+module.exports = {
+  ROOT,
+  env,
+  promptConfig,
+  designers,
+  models,
+  paths: {
+    // These live INSIDE docs/ on purpose — GitHub Pages only serves the
+    // /docs folder, so the dashboard (docs/index.html) can only fetch
+    // files that are physically inside docs/.
+    progress: path.join(ROOT, "docs", "progress.json"),
+    failedCsv: path.join(ROOT, "docs", "failed.csv"),
+    preview: path.join(ROOT, "preview"),
+    runLog: path.join(ROOT, "docs", "last-run-log.json"),
+    history: path.join(ROOT, "docs", "history.json"),
+    queueState: path.join(ROOT, "docs", "queue_state.json"),
+  },
+};

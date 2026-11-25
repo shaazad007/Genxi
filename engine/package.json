@@ -1,0 +1,16 @@
+{
+  "name": "genxi-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Private Genxi SEO automation engine",
+  "type": "commonjs",
+  "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node index.js --mode=preview",
+    "preview": "node index.js --mode=preview"
+  },
+  "license": "UNLICENSED"
+}

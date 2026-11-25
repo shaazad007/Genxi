@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Genxi - Build Dashboard</title>
+<style>
+:root{color-scheme:dark;--bg:#000;--t:#f2f2f2;--m:#8a8a8a;--ln:#262626;--done:#2fbf71;--imp:#e0a526;--pen:#4a4a4a;box-sizing:border-box}
+*{box-sizing:inherit}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:max(20px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom))}
+.w{max-width:1100px;margin:auto}h1{font-size:24px;margin:0 0 4px}.m{color:var(--m);font-size:13px}
+.top{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+.tot{font-size:40px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.lg{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:13px;color:var(--m)}.lg b{color:var(--t)}
+.ops{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:0 0 18px}.ops>div{border:1px solid var(--ln);padding:13px;border-radius:12px}.ops strong,.ops span{display:block}.ops span{font-size:12px;color:var(--m);margin-top:5px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.ph{border:1px solid var(--ln);border-radius:14px}.ph.open{grid-column:1/-1;border-color:#3a3a3a}
+.hd{all:unset;box-sizing:border-box;display:block;width:100%;padding:16px;cursor:pointer}.hd:focus-visible{outline:2px solid var(--done);outline-offset:-2px;border-radius:14px}
+.r{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.nm{font-weight:650}.pc{font-variant-numeric:tabular-nums;font-weight:700}
+.seg{display:flex;gap:3px;margin:12px 0 10px}.seg i{flex:1;height:8px;border-radius:2px;background:var(--pen)}
+.seg i.Done{background:var(--done)}.seg i.Implemented{background:var(--imp)}.seg i.bl{background:#1f1f1f;box-shadow:inset 0 0 0 1px #3a3a3a}
+.dt{padding:0 16px 16px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:760px}th{font-weight:500;color:var(--m);font-size:12px;text-align:left;padding:8px 10px;border-bottom:1px solid var(--ln)}
+td{padding:10px;border-bottom:1px solid var(--ln);vertical-align:top}tr[data-id]{cursor:pointer}tr[data-id]:hover td{background:#0f0f0f}tr.bl td{color:#8d8d8d}
+.id{font:600 13px ui-monospace,Menlo,Consolas,monospace;white-space:nowrap}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;border:1px solid var(--pen);white-space:nowrap}
+.pill.Done{color:var(--done);border-color:var(--done)}.pill.Implemented{color:var(--imp);border-color:var(--imp)}
+.dp{color:var(--m)}.dp u{text-decoration:none;color:var(--imp)}
+#toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translateX(-50%);background:#f2f2f2;color:#000;padding:10px 16px;border-radius:99px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style></head><body><div class="w" id="w"></div><div id="toast"></div>
+<script>
+// Agents: keep "st" identical to GENXI_PLAN.md; set "blocker" when an external gate prevents a Pending task from starting.
+const PH=["Foundation & independent identity", "OAuth and Login", "AI Processing Backend", "App UI and Product Flow", "Trial and Plans", "Theme Health (read-only)", "GitHub-first QA and Launch", "Google Cloud & Firebase (later)", "Hybrid switch & failover QA"];
+const TASKS=[
+  {
+    "id": "T001",
+    "p": 1,
+    "name": "Genxi repo structure, README, environment template and AGENTS.md",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T040"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T002",
+    "p": 1,
+    "name": "Create independent Genxi Shopify app; validate distribution and scopes",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T041"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T003",
+    "p": 1,
+    "name": "Portable Node.js control API and health endpoint; local HTTPS pilot gateway",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T001",
+      "T042"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T004",
+    "p": 1,
+    "name": "Server-only secrets, encrypted token vault and redacted logging",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T003"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T005",
+    "p": 1,
+    "name": "Genxi design tokens, app ID and white/green UI",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T001",
+      "T040"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T039",
+    "p": 1,
+    "name": "Audit AutoGenSEO source, pin upstream commit, record license/provenance",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [],
+    "st": "Done"
+  },
+  {
+    "id": "T040",
+    "p": 1,
+    "name": "Create separate private Genxi repository; copy source only, disable inherited workflows; reset identity",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T039"
+    ],
+    "st": "Implemented"
+  },
+  {
+    "id": "T041",
+    "p": 1,
+    "name": "Audit inherited secrets, shop IDs, history, data, workflows and package identifiers",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T040"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T042",
+    "p": 1,
+    "name": "Extract portable engine and execution/state adapter interfaces",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T001",
+      "T041"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T006",
+    "p": 2,
+    "name": "/auth/install redirect to Shopify",
+    "model": "Sol 5.6",
+    "lvl": "Medium",
+    "dep": [
+      "T002",
+      "T003"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T007",
+    "p": 2,
+    "name": "/auth/callback: HMAC check, state nonce, code to token",
+    "model": "Sol 5.6",
+    "lvl": "Medium",
+    "dep": [
+      "T006",
+      "T004"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T008",
+    "p": 2,
+    "name": "One-time deep-link code exchange; encrypted server-side offline token vault",
+    "model": "Sol 5.6",
+    "lvl": "Medium",
+    "dep": [
+      "T007"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T009",
+    "p": 2,
+    "name": "App: Login with Shopify and secure Genxi session storage",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T005",
+      "T008"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T010",
+    "p": 2,
+    "name": "Session check, re-auth, logout",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T009"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T011",
+    "p": 2,
+    "name": "Mandatory webhooks: app/uninstalled, data request and redact",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T007"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T012",
+    "p": 3,
+    "name": "POST /generate contract; shared worker input schema",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T003",
+      "T042"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T013",
+    "p": 3,
+    "name": "Gemini vision prompt with Pakistani fashion vocabulary",
+    "model": "Sol 5.6",
+    "lvl": "Medium",
+    "dep": [
+      "T012"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T014",
+    "p": 3,
+    "name": "Structured JSON output, validation, retries",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T013"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T015",
+    "p": 3,
+    "name": "Fallback chain: Gemini → Groq → Cloudflare Workers AI",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T014"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T016",
+    "p": 3,
+    "name": "No server image storage; scrub logs, previews and artifacts",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T012"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T017",
+    "p": 3,
+    "name": "Durable per-shop usage counter and rate limit",
+    "model": "Sol 5.6",
+    "lvl": "Medium",
+    "dep": [
+      "T012",
+      "T043"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T043",
+    "p": 3,
+    "name": "GitHub durable state adapter: per-shop queue, checkpoint, CAS and usage ledger",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T042",
+      "T004"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T044",
+    "p": 3,
+    "name": "GitHub Actions runner: preview/live, enqueue, schedule, bounded retry and concurrency",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T042",
+      "T043",
+      "T015",
+      "T016",
+      "T008"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T046",
+    "p": 3,
+    "name": "GitHub pilot control-plane deployment and secure per-shop job authorization",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T008",
+      "T011",
+      "T044"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T047",
+    "p": 3,
+    "name": "GitHub free allowance guard, workflow timeout, AI quota and safe pause",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T044",
+      "T017"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T018",
+    "p": 4,
+    "name": "App shell and bottom navigation",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T005"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T019",
+    "p": 4,
+    "name": "Shopify GraphQL Admin API adapter: scoped collections/products, pagination",
+    "model": "Sol 5.6",
+    "lvl": "Medium",
+    "dep": [
+      "T008"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T020",
+    "p": 4,
+    "name": "Local cache, tags and queue view; sync authoritative durable queue",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T018",
+      "T043"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T021",
+    "p": 4,
+    "name": "Home screen: 3 KPIs, progress, recent items",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T018",
+      "T020"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T022",
+    "p": 4,
+    "name": "Categories screen and thumbnail grid",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T018",
+      "T019"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T023",
+    "p": 4,
+    "name": "Long-press checkbox sheet and apply-to-rest",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T020",
+      "T022"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T024",
+    "p": 4,
+    "name": "Product detail screen",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T022"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T025",
+    "p": 4,
+    "name": "Queue and processing flow via execution adapter, preview/live guard",
+    "model": "Sol 5.6",
+    "lvl": "Medium",
+    "dep": [
+      "T012",
+      "T014",
+      "T020",
+      "T023",
+      "T044",
+      "T045",
+      "T047"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T026",
+    "p": 4,
+    "name": "Review screen: editable fields, tag-vs-image warning",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T025"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T027",
+    "p": 4,
+    "name": "Publish approved SEO to Shopify with idempotent reconciliation",
+    "model": "Sol 5.6",
+    "lvl": "Medium",
+    "dep": [
+      "T019",
+      "T026",
+      "T043"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T045",
+    "p": 4,
+    "name": "Hybrid mode API and app Settings: GitHub active; Cloud not configured; pause/resume",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T018",
+      "T044"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T028",
+    "p": 5,
+    "name": "Server-side trial counter enforcement",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T017"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T029",
+    "p": 5,
+    "name": "Plans screen and plan limits",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T018",
+      "T028"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T030",
+    "p": 5,
+    "name": "Shopify Billing API, subject to approved distribution model",
+    "model": "Sol 5.6",
+    "lvl": "Medium",
+    "dep": [
+      "T007",
+      "T029",
+      "T002"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T031",
+    "p": 6,
+    "name": "read_themes permission flow",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T007"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T032",
+    "p": 6,
+    "name": "Theme analyzer: schema, heavy scripts, lazy loading, mobile",
+    "model": "Sol 5.6",
+    "lvl": "Medium",
+    "dep": [
+      "T031"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T033",
+    "p": 6,
+    "name": "Issue report as MD files and Health tab",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T018",
+      "T032"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T034",
+    "p": 6,
+    "name": "Fix-it-for-me request button (no auto-edit)",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T033"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T035",
+    "p": 7,
+    "name": "GitHub-first end-to-end test on own store; preview then approved live",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T027",
+      "T046",
+      "T047",
+      "T048",
+      "T028"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T036",
+    "p": 7,
+    "name": "Token usage and cost check in Google AI Studio",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T014"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T037",
+    "p": 7,
+    "name": "Privacy policy, terms and Shopify distribution/review readiness",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T011",
+      "T002"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T038",
+    "p": 7,
+    "name": "Pilot with 2–3 brands only after permitted distribution and billing",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T035",
+      "T037",
+      "T030",
+      "T036"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T048",
+    "p": 7,
+    "name": "GitHub-only queue restart, duplicate prevention, isolation and secret leakage tests",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T025",
+      "T046",
+      "T047"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T049",
+    "p": 8,
+    "name": "Explicit owner opt-in: create independent Google Cloud/Firebase project, billing and region audit",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T035"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T050",
+    "p": 8,
+    "name": "Firestore authoritative state adapter: jobs, ledgers, lease, mode epoch; rules and indexes",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T049",
+      "T043"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T051",
+    "p": 8,
+    "name": "Cloud Run service/control API and worker container/Cloud Run Jobs; scale-to-zero",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T049",
+      "T042",
+      "T004"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T052",
+    "p": 8,
+    "name": "Secret Manager, service accounts, GitHub OIDC/WIF and least privilege",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T049",
+      "T051"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T053",
+    "p": 8,
+    "name": "Cloud Scheduler authenticated trigger; disable duplicate cron execution",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T051",
+      "T052",
+      "T050"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T054",
+    "p": 8,
+    "name": "Firebase auth/session integration, tenant access rules and emulator tests",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T050",
+      "T051",
+      "T052",
+      "T009"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T055",
+    "p": 8,
+    "name": "Google free-tier quotas: preflight guards, budget alerts, max instances, log/registry controls",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T049",
+      "T050",
+      "T051",
+      "T053"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T056",
+    "p": 8,
+    "name": "Cloud worker adapter, shared contract parity and staging preview test",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T051",
+      "T052",
+      "T053",
+      "T054",
+      "T055",
+      "T015"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T057",
+    "p": 9,
+    "name": "Migrate GitHub queue/ledger/checkpoints to Firestore after drain; reconcile counts and IDs",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T056",
+      "T048"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T058",
+    "p": 9,
+    "name": "Atomic mode controller, shared leases and fencing; GitHub and Cloud use same state authority",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T057",
+      "T045",
+      "T052"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T059",
+    "p": 9,
+    "name": "Switch GitHub OFF → Cloud ON and reverse; auto fallback on eligible failures, never dual writers",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T058"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T060",
+    "p": 9,
+    "name": "Failover, interrupted write, quota exhaustion, rollback, multi-tenant and cost tests",
+    "model": "Luna",
+    "lvl": "High",
+    "dep": [
+      "T059",
+      "T056",
+      "T055"
+    ],
+    "st": "Pending"
+  },
+  {
+    "id": "T061",
+    "p": 9,
+    "name": "Production acceptance: both modes verified; runbook and dashboard evidence",
+    "model": "Luna",
+    "lvl": "Medium",
+    "dep": [
+      "T060",
+      "T035"
+    ],
+    "st": "Pending"
+  }
+];
+const byId=Object.fromEntries(TASKS.map(t=>[t.id,t])),open=new Set();
+const unmet=t=>t.dep.filter(d=>byId[d].st!=='Done'),blk=t=>t.st==='Pending'&&(unmet(t).length>0||Boolean(t.blocker));
+const cnt=(a,s)=>a.filter(t=>t.st===s).length;
+function toast(x){const e=document.getElementById('toast');e.textContent=x;e.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.opacity=0,1600)}
+function copy(x){(navigator.clipboard?navigator.clipboard.writeText(x):Promise.reject()).catch(()=>{const a=document.createElement('textarea');a.value=x;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()});toast('Copied: '+x)}
+function render(){
+ const d=cnt(TASKS,'Done'),i=cnt(TASKS,'Implemented'),b=TASKS.filter(blk).length;
+ let h=`<div class="top"><div><h1>Genxi - Build Dashboard</h1><div class="m">Planning dashboard · Tap a phase to see tasks, then a task to copy its start command.</div><div class="lg"><span><b>${d}</b> done</span><span><b>${i}</b> implemented</span><span><b>${TASKS.length-d-i-b}</b> ready</span><span><b>${b}</b> blocked</span></div></div><div class="tot">${Math.round(d/TASKS.length*100)}%</div></div><div class="ops"><div><strong>Stage A · GitHub-first</strong><span>Planned initial mode · not deployed</span></div><div><strong>Stage B · Google Cloud + Firebase</strong><span>Deferred · owner opt-in required</span></div><div><strong>Hybrid controller</strong><span>One active worker · shared checkpoints after migration</span></div></div><div class="grid">`;
+ PH.forEach((n,k)=>{const a=TASKS.filter(t=>t.p===k+1),dn=cnt(a,'Done'),o=open.has(k);
+  h+=`<article class="ph${o?' open':''}"><button class="hd" data-k="${k}" aria-expanded="${o}"><div class="r"><span class="nm">Phase ${k+1}: ${n}</span><span class="pc">${Math.round(dn/a.length*100)}%</span></div><div class="seg">${a.map(t=>`<i class="${t.st}${blk(t)?' bl':''}" title="${t.id}"></i>`).join('')}</div><div class="m">${a.length} tasks · ${dn} done · ${cnt(a,'Implemented')} implemented · ${a.filter(blk).length} blocked</div></button>`;
+  if(o)h+=`<div class="dt"><table><thead><tr><th>ID</th><th>Task</th><th>Model</th><th>Level</th><th>Depends on</th><th>Status</th></tr></thead><tbody>${a.map(t=>`<tr data-id="${t.id}" class="${blk(t)?'bl':''}"><td class="id">${t.id}</td><td>${t.name}${t.blocker?`<div class="m">${t.blocker}</div>`:''}</td><td>${t.model}</td><td>${t.lvl}</td><td class="dp">${t.dep.length?t.dep.map(x=>byId[x].st==='Done'?x:`<u>${x}</u>`).join(', '):'none'}</td><td><span class="pill ${t.st}" title="${t.blocker||''}">${t.st}${blk(t)?' · blocked':''}</span></td></tr>`).join('')}</tbody></table></div>`;
+  h+='</article>'});
+ document.getElementById('w').innerHTML=h+'</div>';
+ document.querySelectorAll('.hd').forEach(e=>e.onclick=()=>{const k=+e.dataset.k;open.has(k)?open.delete(k):open.add(k);render()});
+ document.querySelectorAll('tr[data-id]').forEach(e=>e.onclick=()=>copy('Task '+e.dataset.id+' shuru karo'));
+}
+render();
+</script></body></html>
