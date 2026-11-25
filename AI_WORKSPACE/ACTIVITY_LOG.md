@@ -67,3 +67,9 @@
 
 - Before correcting the next-task Git-history reference, created and verified `backups/SOURCE_BACKUP_2026-11-25_16-50-22_BEFORE_TASK-T001_FINAL_RECORD.zip` (99,533 bytes, 53 entries; every entry SHA-256 matched source; excluded caches, local secrets and backup archives).
 - Updated `AI_WORKSPACE/T001_TASK_RECORD.md` and `AI_WORKSPACE/NEXT_TASK.md`. No application files changed. T041 remains Pending; no stage transition asserted.
+
+## 2026-11-25 — T001 commit and remote sync
+
+- Before recording the commit, verified `backups/SOURCE_BACKUP_2026-11-25_16-54-28_BEFORE_TASK-T001_COMMIT_RECORD.zip` (99,701 bytes; 53 entries; all SHA-256 hashes match).
+- Implementation commit `1809d6b5d4357b3df50c621eaddfe973a2ccc3db` was pushed to private `origin/main`; `git ls-remote` matched the local HEAD. T001 remains Done; no tests/builds were run and no phase was advanced.
+- Updated: `AI_WORKSPACE/T001_TASK_RECORD.md`, `AI_WORKSPACE/ACTIVITY_LOG.md`. Deleted: none.

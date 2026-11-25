@@ -13,5 +13,7 @@
 - Files created: `.env.example`, `docs/QUICKSTART.md`, `app/README.md`, `control-api/README.md`, `adapters/github/README.md`, `adapters/gcp/README.md`, `infra/README.md`, `tests/README.md`.
 - Files modified: `README.md`, `AGENTS.md`, `.gitignore`, `GENXI_PLAN.md`, `genxi-dashboard.html`, `AI_WORKSPACE/T001_TASK_RECORD.md`, `AI_WORKSPACE/NEXT_TASK.md`, `AI_WORKSPACE/DECISIONS.md`, `AI_WORKSPACE/CHANGELOG_AGENT.md`, `AI_WORKSPACE/ACTIVITY_LOG.md`.
 - Deleted: none. No runtime application code or workflow added.
+- Pre-commit-record backup: `backups/SOURCE_BACKUP_2026-11-25_16-54-28_BEFORE_TASK-T001_COMMIT_RECORD.zip` (99,701 bytes; 53 entries; every ZIP entry SHA-256 verified; same exclusions).
 - Validation: static checks confirmed 8 scaffold/docs files exist, all 4 required and 5 optional environment keys from `engine/lib/config.js` appear in the template, values are placeholders, root and engine `.env` are ignored while `.env.example` is trackable, README link resolves, and no workflows were added. Tests/builds not run.
+- Implementation commit: `1809d6b5d4357b3df50c621eaddfe973a2ccc3db` (`Set up Genxi repository foundation`), pushed to private `origin/main`; local and remote refs matched.
 - Next: T041 remains Pending and unstarted. No phase transition or numeric stage asserted; see Git history for the synchronized T001 commit.
