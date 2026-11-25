@@ -7,3 +7,9 @@
 - This audit note does not create or replace `MASTER_WORKFLOW.md`.
 
 - Session override: the user directed this session to ignore `MASTER_WORKFLOW.md`; therefore no numeric stage was asserted and no stage transition was recorded.
+
+## T041 audit checkpoint — 2026-11-25
+
+- T041 is Phase 1 security/repository audit only; it did not change any stage or workflow setting.
+- The private repo has no workflow files/runs; Actions are enabled. Review before T044 is tracked in ISSUE-004.
+- No numeric stage asserted because the user directed this session to ignore `MASTER_WORKFLOW.md`.

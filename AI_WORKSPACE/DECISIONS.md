@@ -16,6 +16,11 @@
 - Imported the pinned engine allowlist only; omitted all upstream workflows, store config/data, preview output, queues/history/logs, and fixture-driven tests. The Genxi package remains private and defaults to preview.
 - Replaced the upstream store name/url sanitizer literals with configurable `GENXI_BRAND_NAME` and `GENXI_BRAND_URL` environment values. No numeric stage or stage transition is asserted; `MASTER_WORKFLOW.md` was ignored for this session per user direction.
 
+## DEC-004 — T041 security audit disposition (2026-11-25)
+
+- No real credential, shop-domain, runtime-data or inherited-workflow finding was present in tracked files or reachable Git history. The only shop-domain pattern was the generic `.env.example` placeholder. GitHub reports Actions enabled but zero workflows/runs and zero repo secrets/variables/environments.
+- Do not change repository Actions settings during this audit. Track review before T044 in ISSUE-004; track the starter `org.example` package mismatch for T002 in ISSUE-003. No Shopify app or Cloud resource was created.
+
 ## DEC-002 ? Private source import scope (2026-11-25)
 
 - Imported the pinned engine allowlist only; omitted all upstream workflows, store config/data, preview output, queues/history/logs, and fixture-driven tests. The Genxi package remains private and defaults to preview.

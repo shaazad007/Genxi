@@ -1,6 +1,6 @@
 # Genxi — Hybrid SEO Automation Build Plan
 
-**Revision:** 2026-11-25 | **Status:** T039 audit, T040 private engine import and T001 repository foundation complete; Flutter app/control API implementation not started | **Initial worker:** GitHub Actions | **Future worker:** Google Cloud + Firebase
+**Revision:** 2026-11-25 | **Status:** T039 audit, T040 private engine import, T001 foundation and T041 security audit complete; Shopify app and Flutter implementation not started | **Initial worker:** GitHub Actions | **Future worker:** Google Cloud + Firebase
 
 Genxi is an independent Flutter Shopify app for Pakistani clothing brands. It reads product images with Gemini Vision, combines them with owner checkbox input (gala, daaman, sleeve embroidery, dupatta, trouser), generates English SEO and publishes approved changes to Shopify. Reuse AutoGenSEO source where appropriate; do not modify its existing repository or production data.
 
@@ -71,12 +71,12 @@ Both adapters → same portable Node.js worker → AI providers → approved Sho
 
 ## 6. Agent rules and acceptance
 
-- Follow this file and `genxi-dashboard.html`. Preserve original T001–T038 IDs; new T039–T061 add source migration and hybrid DevOps. Existing descriptions/dependencies changed where necessary for remote operation and safety. T039 audit, T040 private engine import and T001 repository foundation are complete; product-level Flutter app and control API implementation have not started.
+- Follow this file and `genxi-dashboard.html`. Preserve original T001–T038 IDs; new T039–T061 add source migration and hybrid DevOps. Existing descriptions/dependencies changed where necessary for remote operation and safety. T039 audit, T040 private engine import, T001 foundation and T041 security audit are complete; product-level Flutter app and control API implementation have not started.
 - Model labels carried from original (Luna Medium/High, Sol 5.6 Medium) are historical assignment labels, not guaranteed available model IDs; select available equivalents. Report Roman Urdu; code/comments English.
 - On `Task Txxx shuru karo`, read plan, verify dependencies Done, inspect repo/AGENTS.md, implement, test and record evidence. Pending = not started/blocked; Implemented = code written but unverified; Done = verified acceptance. Update both files in same commit; no fabricated status. Do not deploy, enable billing, publish live products or change original repo without appropriate owner approval.
 - Stage A acceptance: independent Genxi identity and repo, GitHub preview and approved live test, durable queue/resume/tenant isolation, review/publish, cost guard and webhook tests. Stage B acceptance: both providers same contract, migrated authoritative state, switch both directions, interruption recovery, no duplicate publish, shared usage limits and no uncontrolled charges. Phase 8 is deliberately deferred until owner opts in; GitHub launch does not depend on Cloud readiness.
 
-**Next task:** T001 Done. Repository foundation and static acceptance checks are recorded in `AI_WORKSPACE/T001_TASK_RECORD.md`; pre-implementation backup verified 44/44 entries. T041 is Pending and has not been started. The user directed this session to ignore `MASTER_WORKFLOW.md`; no numeric stage or transition is asserted. Do not automatically advance stages.
+**Next task:** T041 Done; audit results and ISSUE-003/ISSUE-004 are recorded in `AI_WORKSPACE/T041_TASK_RECORD.md` and `AI_WORKSPACE/ISSUES.md`. T002 is the next Pending task and has not been started. The user directed this session to ignore `MASTER_WORKFLOW.md`; no numeric stage or transition is asserted. Do not automatically advance stages.
 
 ## 7. Phases and tasks
 
@@ -91,7 +91,7 @@ Both adapters → same portable Node.js worker → AI providers → approved Sho
 | T005 | Genxi design tokens, app ID and white/green UI | Luna | Medium | T001, T040 | Pending |
 | T039 | Audit AutoGenSEO source, pin upstream commit, record license/provenance | Luna | Medium | - | Done |
 | T040 | Create separate private Genxi repository; copy source only, disable inherited workflows; reset identity | Luna | High | T039 | Done |
-| T041 | Audit inherited secrets, shop IDs, history, data, workflows and package identifiers | Luna | High | T040 | Pending |
+| T041 | Audit inherited secrets, shop IDs, history, data, workflows and package identifiers | Luna | High | T040 | Done |
 | T042 | Extract portable engine and execution/state adapter interfaces | Luna | High | T001, T041 | Pending |
 
 ### Phase 2: OAuth and Login

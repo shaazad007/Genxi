@@ -12,3 +12,18 @@
 
 - Resolution: `DEVELOPMENT_RULES.md` was provided, the user directed this session to ignore `MASTER_WORKFLOW.md`, GitHub CLI authenticated as `shaazad007`, and the private target repository was created and verified.
 - Status: Resolved. No numeric stage was asserted.
+
+## ISSUE-003 — Placeholder Kotlin package identifier
+
+- Related task: T002
+- Finding: `engine/package.json` uses private package name `genxi-engine` and Gradle root name is `genxi`, but the existing root Kotlin starter still declares `org.example`. The planned Flutter application ID `com.genxi.app` is not present or validated.
+- Impact: the Kotlin starter is not the Genxi app and must not be shipped as such. T002 must establish and validate the actual Shopify/Flutter app identifiers.
+- Status: Open; no application package was changed during T041.
+
+## ISSUE-004 — GitHub Actions enabled before preview validation
+
+- Related task: T044
+- Finding: repository Actions setting is enabled, while the repository currently has zero workflow files and zero workflow runs; no repository secrets, variables or environments are configured.
+- Impact: a future workflow could execute as soon as added. `GENXI_PLAN.md` says to keep inherited Actions disabled until Genxi preview tests pass.
+- Owner/technical action: review or disable Actions before adding a workflow in T044. T041 was an audit; no repository setting was changed.
+- Status: Open; no inherited workflow is currently present or running.

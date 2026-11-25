@@ -45,3 +45,9 @@
 - Added module scaffold READMEs, Genxi quickstart and placeholder-only `.env.example`; linked the quickstart from the root README and documented repo boundaries in AGENTS.md.
 - Added root/engine local `.env` ignore rules. Synchronized T001 Done in plan/dashboard after static acceptance checks; no application runtime or workflow added.
 - Tests/builds not run. Evidence and file inventory are in `AI_WORKSPACE/T001_TASK_RECORD.md`.
+
+## 2026-11-25 — T041 security and identity audit
+
+- Audited current files, all reachable Git blobs/history and GitHub Actions metadata. No real credentials, shop domain, production/runtime data, inherited workflows or upstream Git ancestry found. Generic sample domain in `.env.example` only.
+- Found the Kotlin starter `org.example` package and Actions enabled with zero workflows/runs; recorded ISSUE-003 and ISSUE-004 for T002/T044. No app source, GitHub setting or Shopify data changed.
+- T041 marked Done in plan/dashboard after evidence review. No tests/builds run; no phase advanced.

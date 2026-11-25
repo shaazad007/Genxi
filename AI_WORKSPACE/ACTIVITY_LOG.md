@@ -73,3 +73,12 @@
 - Before recording the commit, verified `backups/SOURCE_BACKUP_2026-11-25_16-54-28_BEFORE_TASK-T001_COMMIT_RECORD.zip` (99,701 bytes; 53 entries; all SHA-256 hashes match).
 - Implementation commit `1809d6b5d4357b3df50c621eaddfe973a2ccc3db` was pushed to private `origin/main`; `git ls-remote` matched the local HEAD. T001 remains Done; no tests/builds were run and no phase was advanced.
 - Updated: `AI_WORKSPACE/T001_TASK_RECORD.md`, `AI_WORKSPACE/ACTIVITY_LOG.md`. Deleted: none.
+
+## 2026-11-25 — T041 security audit
+
+- Agent: Codex. Task: T041. Phase: Phase 1; no numeric stage asserted per user direction to ignore `MASTER_WORKFLOW.md`.
+- Backup: `backups/SOURCE_BACKUP_2026-11-25_17-21-45_BEFORE_TASK-T041_SECURITY_AUDIT.zip` verified (99,968 bytes; 53 entries); status-sync backup `backups/SOURCE_BACKUP_2026-11-25_17-32-33_BEFORE_TASK-T041_AUDIT_RECORD.zip` verified (101,141 bytes; 54 entries); every entry hash matched.
+- Result: no real credential patterns, private shop domains, inherited runtime data or workflows in current files/history; no upstream commit reachable. Generic example domain only. GitHub: private repo, 0 workflows/runs, 0 secret names, 0 variables, 0 environments; Actions enabled. Four commits, one root; remote main only, no tags.
+- Findings: root Kotlin `org.example` starter identifier is not the Genxi Flutter app; app ID remains uncreated. Actions must be reviewed before T044 adds workflows. Added ISSUE-003 and ISSUE-004; no repo settings or application source changed.
+- Updated: `GENXI_PLAN.md`, `genxi-dashboard.html`, `AI_WORKSPACE/T041_TASK_RECORD.md`, `AI_WORKSPACE/NEXT_TASK.md`, `AI_WORKSPACE/ISSUES.md`, `AI_WORKSPACE/DECISIONS.md`, `AI_WORKSPACE/WORKFLOW_AUDIT.md`, `AI_WORKSPACE/CHANGELOG_AGENT.md`, `AI_WORKSPACE/ACTIVITY_LOG.md`. Deleted: none.
+- Validation: current/history scans reported categories only; no values printed. No tests/builds or Shopify writes. T041 Done; T002 Pending; no stage transition.
