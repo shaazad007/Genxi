@@ -1,0 +1,22 @@
+# T027 Task Record — Publish approved SEO with idempotent reconciliation
+
+- Started: 2026-11-27
+- Scope: Server-side approved SEO publish contract, idempotency key handling, read-back reconciliation, and authenticated live guard.
+- Dependencies verified: T019, T026 and T043 are Done.
+- Pre-edit source backup: `AI_WORKSPACE/backups/SOURCE_BACKUP_2026-11-27_05-50-56_BEFORE_TASK-T027_PUBLISH_RECONCILIATION.zip`
+- Backup verification: PASS; 308 entries; forbidden local properties, credentials, caches, generated outputs, and backup paths excluded.
+- Implementation: Implemented. Added approved-live publish adapter with bounded draft validation, idempotency-key short circuit, read-back reconciliation after success/unknown outcome, and authenticated `/publish` route guards.
+- Validation: publish/reconciliation tests 3/3; related GraphQL, queue, hybrid-mode and Cloud Run regressions 9/9.
+- Files changed: `control-api/lib/shopifyPublish.js`, `control-api/lib/publishRoute.js`, `control-api/server.js`, `tests/t027_publish_reconciliation.test.cjs`, this task record and status logs.
+- Shopify/API writes: none. Tests use injected mock clients only; no deployment or live owner-store mutation was authorized.
+- Acceptance: Implemented, pending owner-authorized live preview/approved publish verification and production publisher wiring.
+- Resume checkpoint: production publisher wiring completed with a feature-flagged server-side Shopify client; live mutation remains disabled unless both `GENXI_PUBLISH_ENABLED=true` and `GENXI_ALLOW_LIVE=true` are configured and owner authorization is supplied.
+- Wiring backup: `AI_WORKSPACE/backups/SOURCE_BACKUP_2026-11-27_05-54-45_BEFORE_TASK-T027_PUBLISH_WIRING.zip` (311 entries; exclusions verified).
+- Wiring validation: publish/reconciliation tests 3/3 and Cloud Run config tests 3/3 pass; no live request was made.
+- Live verification attempt: read-only `https://saraclothes.myshopify.com/admin/api/2025-07/graphql.json` product query returned HTTP 401 using the configured `atkn_` token values; no product target was selected and no mutation was attempted.
+- Queue-selection resume: created verified backup `AI_WORKSPACE/backups/SOURCE_BACKUP_2026-11-27_06-52-16_BEFORE_TASK-T027_QUEUE_SELECTION.zip` (61 entries). Added a validated Shopify product GID/URL entry flow to the Queue screen and tenant-local queued-item state. This enables selecting the approved product in-app; authoritative queue sync and live publish remain separate guarded steps.
+- Queue-selection validation: `flutter analyze --no-pub` passed with no issues; `flutter test --no-pub test/queue_screen_test.dart` passed 2/2. No Shopify/API write or deployment performed. T027 remains Implemented.
+- Queue-backend wiring: created verified backup `AI_WORKSPACE/backups/SOURCE_BACKUP_2026-11-27_07-25-00_BEFORE_TASK-T027_QUEUE_BACKEND.zip` (5 entries). Added authenticated GitHub Contents enqueue controller and Flutter `/generate` client; Queue preview/live callbacks now submit the selected product IDs instead of remaining inert. Flutter analyzer passed with no issues, Queue tests passed 2/2, Node syntax and T027/Cloud Run regressions passed 6/6. Cloud deployment and live Shopify write remain pending verification.
+- Cloud deployment: deployed revision `genxi-control-api-00013-dgd` to project `genxi-20261125-b943540d`, region `asia-south1`, with OAuth Secret Manager references and least-privilege GitHub token accessor. `/health` returned 200 and unauthenticated `/queue` correctly returned 401. Live Shopify publishing remains disabled pending preview verification.
+- Feedback/build follow-up: Cloud logs showed preview requests accepted (HTTP 202) and live requests previously rejected by the live gate (HTTP 400); added visible Flutter SnackBar success/error feedback. Analyzer clean, Queue tests 2/2, and debug APK rebuilt successfully for SM G780F (`app/build/app/outputs/flutter-apk/app-debug.apk`, 108,688,237 bytes).
+- Live gate: owner-authorized controlled live processing enabled in Cloud Run revision `genxi-control-api-00014-256`; no live request has been verified yet. T027 remains Implemented until the owner runs the controlled live request and read-back reconciliation is evidenced.
