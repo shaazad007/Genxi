@@ -143,10 +143,12 @@ async function runQueueWorker(shopify, { limit, deadlineMs }) {
   // Discover newly eligible products on every worker run and put them ahead of
   // this collection's older pending backlog. Submission order still owns the
   // active collection; later collections never start early.
-  const fresh = await shopify.fetchAllUnprocessedCollectionProducts(job.collection_handle, {
-    publishedFrom: job.criteria?.published_from || null,
-    publishedBefore: job.criteria?.published_before || null,
-  });
+  const fresh = job.collection_handle === "__selected_products__"
+    ? []
+    : await shopify.fetchAllUnprocessedCollectionProducts(job.collection_handle, {
+      publishedFrom: job.criteria?.published_from || null,
+      publishedBefore: job.criteria?.published_before || null,
+    });
   state.continuation_pending = false;
   state.continuation_dispatch_source_run_id = null;
   mergeNewEligibleProducts(state, job, fresh);

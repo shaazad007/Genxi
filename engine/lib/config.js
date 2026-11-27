@@ -12,6 +12,7 @@ try {
 }
 
 const ROOT = path.resolve(__dirname, "..");
+const PROJECT_ROOT = path.resolve(ROOT, "..");
 
 function readJson(fileName, fallback) {
   const filePath = path.join(ROOT, fileName);
@@ -68,11 +69,11 @@ module.exports = {
     // These live INSIDE docs/ on purpose — GitHub Pages only serves the
     // /docs folder, so the dashboard (docs/index.html) can only fetch
     // files that are physically inside docs/.
-    progress: path.join(ROOT, "docs", "progress.json"),
-    failedCsv: path.join(ROOT, "docs", "failed.csv"),
-    preview: path.join(ROOT, "preview"),
-    runLog: path.join(ROOT, "docs", "last-run-log.json"),
-    history: path.join(ROOT, "docs", "history.json"),
-    queueState: path.join(ROOT, "docs", "queue_state.json"),
+    progress: path.join(PROJECT_ROOT, "docs", "progress.json"),
+    failedCsv: path.join(PROJECT_ROOT, "docs", "failed.csv"),
+    preview: path.join(PROJECT_ROOT, "preview"),
+    runLog: path.join(PROJECT_ROOT, "docs", "last-run-log.json"),
+    history: path.join(PROJECT_ROOT, "docs", "history.json"),
+    queueState: path.join(PROJECT_ROOT, "docs", "queue_state.json"),
   },
 };
