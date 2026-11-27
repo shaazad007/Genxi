@@ -2,7 +2,7 @@
 
 const { isValidShopDomain } = require("./oauthInstall");
 
-function createGitHubJobController({ token, repository, branch = "main", pathPrefix = "docs/genxi-state", apiBase = "https://api.github.com", fetchImpl = globalThis.fetch } = {}) {
+function createGitHubJobController({ token, repository, branch = "main", pathPrefix = "docs/genxi-state", workflow = "genxi-runner.yml", apiBase = "https://api.github.com", fetchImpl = globalThis.fetch } = {}) {
   if (!token || !repository || typeof fetchImpl !== "function") return null;
   const pathFor = (shop) => `${pathPrefix.replace(/\/+$/, "")}/${encodeURIComponent(shop)}.json`;
   const headers = { Accept: "application/vnd.github+json", Authorization: `Bearer ${token}`, "X-GitHub-Api-Version": "2022-11-28", "Content-Type": "application/json" };
@@ -53,7 +53,11 @@ function createGitHubJobController({ token, repository, branch = "main", pathPre
           last_continuation_from_run_id: null,
         });
         const response = await fetchImpl(`${apiBase}/repos/${repository}/contents/${pathFor(request.shop)}`, { method: "PUT", headers, redirect: "error", signal: AbortSignal.timeout(10000), body: JSON.stringify({ message: `genxi: enqueue ${request.request_id}`, branch, sha: current.sha || undefined, content: Buffer.from(`${JSON.stringify(next, null, 2)}\n`).toString("base64") }) });
-        if (response.ok) return { queued: true, duplicate: false, revision: next.revision };
+        if (response.ok) {
+          const dispatch = await fetchImpl(`${apiBase}/repos/${repository}/actions/workflows/${workflow}/dispatches`, { method: "POST", headers, redirect: "error", signal: AbortSignal.timeout(10000), body: JSON.stringify({ ref: branch, inputs: { mode: request.mode, confirm_live: request.mode === "live" ? "true" : "false", limit: String(request.product_ids.length), enqueue_request_id: request.request_id, queue_mode: request.mode } }) });
+          if (!dispatch.ok && dispatch.status !== 204) throw new Error("GitHub workflow dispatch failed");
+          return { queued: true, dispatched: true, duplicate: false, revision: next.revision };
+        }
         if (response.status !== 409) throw new Error("GitHub queue write failed");
       }
       throw new Error("GitHub queue CAS retries exhausted");
