@@ -75,6 +75,7 @@ jobs:
       GENXI_USAGE_TOKENS: ${{ secrets.GENXI_USAGE_TOKENS }}
       GENXI_ALLOWANCE_EVIDENCE_FRESH: ${{ secrets.GENXI_ALLOWANCE_EVIDENCE_FRESH }}
       GENXI_JOB_TIME_BUDGET_MINUTES: "320"
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -101,6 +102,12 @@ jobs:
           INPUT_PUBLISHED_BEFORE: ${{ inputs.published_before || '' }}
         run: |
           set -euo pipefail
+          state_file="docs/genxi-state/${SHOPIFY_STORE}.json"
+          if [[ -f "$state_file" ]]; then
+            jq '{schema_version, updated_at, jobs: (.queue.jobs // []), requests: (.queue.requests // [])}' "$state_file" > docs/queue_state.json
+          else
+            printf '{"schema_version":1,"updated_at":null,"jobs":[],"requests":[]}\n' > docs/queue_state.json
+          fi
           if [[ "$REQUESTED_MODE" == "live" && "$CONFIRM_LIVE" != "true" ]]; then
             echo "Live mode requires explicit confirm_live=true" >&2
             exit 2
@@ -118,4 +125,13 @@ jobs:
               attempt=$((attempt + 1))
               sleep 15
             done
+          fi
+          if [[ -f docs/queue_state.json && -f "$state_file" ]]; then
+            jq --slurpfile queue docs/queue_state.json '.queue.jobs = ($queue[0].jobs // []) | .queue.requests = ($queue[0].requests // []) | .updated_at = ($queue[0].updated_at // .updated_at) | .revision = ((.revision // 0) + 1)' "$state_file" > "$state_file.tmp"
+            mv "$state_file.tmp" "$state_file"
+            git config user.name "genxi-runner[bot]"
+            git config user.email "genxi-runner[bot]@users.noreply.github.com"
+            git add "$state_file"
+            git diff --cached --quiet || git commit -m "genxi: persist queue worker state"
+            git push origin HEAD:main
           fi
