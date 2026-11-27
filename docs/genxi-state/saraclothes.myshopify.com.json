@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "shop_id": "saraclothes.myshopify.com",
-  "revision": 14,
+  "revision": 15,
   "updated_at": "2026-11-27T13:42:03.744Z",
   "queue": {
     "jobs": [
