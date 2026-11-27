@@ -1,10 +1,44 @@
 {
   "schema_version": 1,
   "shop_id": "saraclothes.myshopify.com",
-  "revision": 6,
-  "updated_at": "2026-11-27T11:47:49.073Z",
+  "revision": 7,
+  "updated_at": "2026-11-27T13:14:47.937Z",
   "queue": {
-    "jobs": [],
+    "jobs": [
+      {
+        "queue_job_id": "mobile-1795785287028387",
+        "collection_handle": "__selected_products__",
+        "collection_title": "Selected products",
+        "criteria": {},
+        "mode": "preview",
+        "submission_order": 1,
+        "created_at": "2026-11-27T13:14:47.937Z",
+        "updated_at": "2026-11-27T13:14:47.937Z",
+        "status": "queued",
+        "total": 1,
+        "completed": 0,
+        "skipped": 0,
+        "failed": 0,
+        "remaining": 1,
+        "items": [
+          {
+            "product_id": "gid://shopify/Product/15466824466660",
+            "title": "",
+            "status": "pending",
+            "attempts": 0
+          }
+        ],
+        "completed_product_ids": [],
+        "skipped_product_ids": [],
+        "failed_product_ids": [],
+        "current_run_id": null,
+        "last_run_id": null,
+        "run_history": [],
+        "wait_reason": null,
+        "continuation_attempts": 0,
+        "last_continuation_from_run_id": null
+      }
+    ],
     "requests": [
       {
         "request_id": "mobile-1795778059570655",
@@ -59,6 +93,15 @@
         ],
         "mode": "live",
         "created_at": "2026-11-27T11:47:49.073Z"
+      },
+      {
+        "request_id": "mobile-1795785287028387",
+        "logical_job_id": "mobile-1795785287028387",
+        "product_ids": [
+          "gid://shopify/Product/15466824466660"
+        ],
+        "mode": "preview",
+        "created_at": "2026-11-27T13:14:47.937Z"
       }
     ]
   },
