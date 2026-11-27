@@ -40,6 +40,10 @@ function optionalEnv(name) {
 }
 
 const promptConfig = readJson("config.json", {});
+promptConfig.gemini_model_vision =
+  optionalEnv("GEMINI_MODEL_VISION") || promptConfig.gemini_model_vision || "gemini-3.5-flash-lite";
+promptConfig.gemini_model_text =
+  optionalEnv("GEMINI_MODEL_TEXT") || promptConfig.gemini_model_text || "gemini-3.5-flash-lite";
 const designers = readJson("designers.json", []);
 const models = readJson("models.json", []);
 
