@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "shop_id": "saraclothes.myshopify.com",
-  "revision": 8,
-  "updated_at": "2026-11-27T13:14:55.145Z",
+  "revision": 9,
+  "updated_at": "2026-11-27T13:19:31.044Z",
   "queue": {
     "jobs": [
       {
@@ -13,27 +13,41 @@
         "mode": "preview",
         "submission_order": 1,
         "created_at": "2026-11-27T13:14:47.937Z",
-        "updated_at": "2026-11-27T13:14:47.937Z",
-        "status": "queued",
+        "updated_at": "2026-11-27T13:19:14.814Z",
+        "status": "completed",
         "total": 1,
         "completed": 0,
-        "skipped": 0,
+        "skipped": 1,
         "failed": 0,
-        "remaining": 1,
+        "remaining": 0,
         "items": [
           {
             "product_id": "gid://shopify/Product/15466824466660",
             "title": "",
-            "status": "pending",
-            "attempts": 0
+            "status": "skipped",
+            "attempts": 1,
+            "last_error": null,
+            "updated_at": "2026-11-27T13:19:14.813Z"
           }
         ],
         "completed_product_ids": [],
-        "skipped_product_ids": [],
+        "skipped_product_ids": [
+          "gid://shopify/Product/15466824466660"
+        ],
         "failed_product_ids": [],
-        "current_run_id": null,
-        "last_run_id": null,
-        "run_history": [],
+        "current_run_id": "46006052365",
+        "last_run_id": "46006052365",
+        "run_history": [
+          {
+            "run_id": "46006052365",
+            "attempt": 1,
+            "started_at": "2026-11-27T13:19:13.928Z",
+            "finished_at": "2026-11-27T13:19:14.814Z",
+            "processed": 0,
+            "failed": 0,
+            "stop_reason": null
+          }
+        ],
         "wait_reason": null,
         "continuation_attempts": 0,
         "last_continuation_from_run_id": null
@@ -46,30 +60,44 @@
         "mode": "live",
         "submission_order": 2,
         "created_at": "2026-11-27T13:14:55.145Z",
-        "updated_at": "2026-11-27T13:14:55.145Z",
-        "status": "queued",
+        "updated_at": "2026-11-27T13:19:31.044Z",
+        "status": "completed",
         "total": 1,
         "completed": 0,
-        "skipped": 0,
+        "skipped": 1,
         "failed": 0,
-        "remaining": 1,
+        "remaining": 0,
         "items": [
           {
             "product_id": "gid://shopify/Product/15466824466660",
             "title": "",
-            "status": "pending",
-            "attempts": 0
+            "status": "skipped",
+            "attempts": 1,
+            "last_error": null,
+            "updated_at": "2026-11-27T13:19:31.043Z"
           }
         ],
         "completed_product_ids": [],
-        "skipped_product_ids": [],
+        "skipped_product_ids": [
+          "gid://shopify/Product/15466824466660"
+        ],
         "failed_product_ids": [],
-        "current_run_id": null,
-        "last_run_id": null,
-        "run_history": [],
+        "current_run_id": "46006052365",
+        "last_run_id": "46006052365",
+        "run_history": [
+          {
+            "run_id": "46006052365",
+            "attempt": 1,
+            "started_at": "2026-11-27T13:19:30.169Z",
+            "finished_at": "2026-11-27T13:19:31.044Z",
+            "processed": 0,
+            "failed": 0,
+            "stop_reason": null
+          }
+        ],
         "wait_reason": null,
-        "continuation_attempts": 0,
-        "last_continuation_from_run_id": null
+        "continuation_attempts": 1,
+        "last_continuation_from_run_id": "46006052365"
       }
     ],
     "requests": [
