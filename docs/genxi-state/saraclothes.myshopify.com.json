@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "shop_id": "saraclothes.myshopify.com",
-  "revision": 4,
-  "updated_at": "2026-11-27T11:32:43.048Z",
+  "revision": 5,
+  "updated_at": "2026-11-27T11:47:42.839Z",
   "queue": {
     "jobs": [],
     "requests": [
@@ -41,6 +41,15 @@
         ],
         "mode": "live",
         "created_at": "2026-11-27T11:32:43.048Z"
+      },
+      {
+        "request_id": "mobile-1795780062044592",
+        "logical_job_id": "mobile-1795780062044592",
+        "product_ids": [
+          "gid://shopify/Product/15466824466660"
+        ],
+        "mode": "preview",
+        "created_at": "2026-11-27T11:47:42.839Z"
       }
     ]
   },
