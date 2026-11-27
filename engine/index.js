@@ -19,9 +19,9 @@ const config = require("./lib/config");
 const { ShopifyClient } = require("./lib/shopify");
 const { runBatch } = require("./lib/processor");
 const { log } = require("./lib/util");
+const { GitHubExecutionAdapter, GitHubStateAdapter } = require("./lib/adapters");
+const stateAdapter = new GitHubStateAdapter(config.paths.queueState);
 const {
-  loadQueueState,
-  saveQueueState,
   enqueueCollections,
   activeJob,
   recomputeJobCounts,
@@ -58,9 +58,12 @@ async function requestQueueContinuation(state, reason) {
     log("Queue continuation was already requested by this run; refusing a duplicate dispatch.");
     return false;
   }
-  const token = process.env.GITHUB_TOKEN;
-  const repository = process.env.GITHUB_REPOSITORY;
-  if (!token || !repository) {
+  const execution = new GitHubExecutionAdapter({
+    token: process.env.GITHUB_TOKEN,
+    repository: process.env.GITHUB_REPOSITORY,
+    apiBase: process.env.GITHUB_API_URL || "https://api.github.com",
+  });
+  if (!execution.token || !execution.repository) {
     log("Queue continuation is waiting for the next schedule: GITHUB_TOKEN or GITHUB_REPOSITORY is unavailable.");
     return false;
   }
@@ -74,26 +77,10 @@ async function requestQueueContinuation(state, reason) {
   state.continuation_dispatch_source_run_id = runId;
   state.last_dispatch_reason = reason;
   state.last_dispatch_at = new Date().toISOString();
-  saveQueueState(config.paths.queueState, state);
-  const apiBase = process.env.GITHUB_API_URL || "https://api.github.com";
-  const response = await fetch(`${apiBase}/repos/${repository}/actions/workflows/auto-process.yml/dispatches`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      ref: "main",
-      return_run_details: true,
-      inputs: { mode: "queue-worker", limit: "100000" },
-    }),
+  await stateAdapter.save("queue", state);
+  await execution.dispatch({
+    inputs: { mode: "queue-worker", limit: "100000" },
   });
-  if (!response.ok && response.status !== 204) {
-    const detail = await response.text().catch(() => "");
-    throw new Error(`GitHub queue continuation dispatch failed (${response.status}): ${detail.slice(0, 400)}`);
-  }
   log(`Queued one worker continuation (${reason}); workflow concurrency serializes it after this run.`);
   return true;
 }
@@ -132,13 +119,13 @@ async function enqueueCollectionRequest(shopify) {
     });
     collections.push({ handle, title: shopify._collectionTitleCache?.[handle] || handle, products, criteria });
   }
-  const state = loadQueueState(config.paths.queueState);
+  const state = await stateAdapter.load("queue");
   const requestId = process.env.INPUT_ENQUEUE_REQUEST_ID || `${currentRunId()}:${process.env.GITHUB_RUN_ATTEMPT || "1"}`;
   const result = enqueueCollections(state, collections, {
     requestId,
     mode: process.env.INPUT_QUEUE_MODE || "live",
   });
-  saveQueueState(config.paths.queueState, state);
+  await stateAdapter.save("queue", state);
   log(result.duplicate
     ? `Duplicate enqueue request ${requestId}; existing jobs were preserved.`
     : `Created ${result.jobs.length} collection queue jobs in selection order.`);
@@ -146,7 +133,7 @@ async function enqueueCollectionRequest(shopify) {
 }
 
 async function runQueueWorker(shopify, { limit, deadlineMs }) {
-  const state = loadQueueState(config.paths.queueState);
+  const state = await stateAdapter.load("queue");
   const job = activeJob(state);
   if (!job) {
     log("GitHub durable queue is empty; no collection work to process.");
@@ -168,7 +155,7 @@ async function runQueueWorker(shopify, { limit, deadlineMs }) {
   job.current_run_id = currentRunId();
   job.last_run_id = currentRunId();
   job.run_history.push({ run_id: currentRunId(), attempt: Number(process.env.GITHUB_RUN_ATTEMPT || 1), started_at: new Date().toISOString() });
-  saveQueueState(config.paths.queueState, state);
+  await stateAdapter.save("queue", state);
 
   const pendingIds = pendingProductIds(job);
   const runLog = [];
@@ -184,7 +171,7 @@ async function runQueueWorker(shopify, { limit, deadlineMs }) {
     queueCollection: { handle: job.collection_handle, title: job.collection_title },
     onProductResult: async ({ productId, status, error }) => {
       recordProductResult(job, productId, status, error);
-      saveQueueState(config.paths.queueState, state);
+      await stateAdapter.save("queue", state);
     },
   });
 
@@ -201,7 +188,7 @@ async function runQueueWorker(shopify, { limit, deadlineMs }) {
     dailyCapReached,
     madeProgress: result.processed + result.failed > 0,
   });
-  saveQueueState(config.paths.queueState, state);
+  await stateAdapter.save("queue", state);
   if (continuationReason) await requestQueueContinuation(state, continuationReason);
   log(`Queue ${job.queue_job_id}: ${job.completed}/${job.total} complete, ${job.remaining} remaining, ${job.failed} failed.`);
 }
@@ -238,7 +225,7 @@ async function main() {
     return;
   }
 
-  if (mode === "queue-worker" || (mode === "scheduled" && activeJob(loadQueueState(config.paths.queueState)))) {
+  if (mode === "queue-worker" || (mode === "scheduled" && activeJob(await stateAdapter.load("queue")))) {
     await runQueueWorker(shopify, { limit, deadlineMs });
     return;
   }

@@ -25,6 +25,7 @@ const { fetchImageAsBase64 } = require("./analyzer");
 const { findMatch } = require("./description");
 const { buildCombinedPromptText, postProcessResult } = require("./promptShared");
 const { fingerprintImages } = require("./designProfile");
+const { parseStructuredJson, validateGenerationResult } = require("./outputValidation");
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 const DEFAULT_GROQ_MODEL = "qwen/qwen3.8-27b"; // current vision-capable model — meta-llama/llama-4-scout was deprecated by Groq on 2026-07-17
@@ -117,12 +118,7 @@ async function generateWithGroq({
     throw new Error("Groq returned no content.");
   }
 
-  let result;
-  try {
-    result = JSON.parse(text);
-  } catch (err) {
-    throw new Error(`Could not parse Groq JSON output: ${err.message}`);
-  }
+  const result = validateGenerationResult(parseStructuredJson(text, "Groq"), { includeDesignProfile });
 
   return postProcessResult(result, {
     promptConfig,

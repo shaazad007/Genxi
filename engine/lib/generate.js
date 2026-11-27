@@ -12,6 +12,7 @@ const { fetchImageAsBase64 } = require("./analyzer");
 const { findMatch } = require("./description");
 const { buildCombinedPromptText, postProcessResult } = require("./promptShared");
 const { fingerprintImages } = require("./designProfile");
+const { parseStructuredJson, validateGenerationResult } = require("./outputValidation");
 
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
@@ -97,12 +98,7 @@ async function generateProductContent({
     throw new Error("Gemini returned no content (possibly blocked by safety filters).");
   }
 
-  let result;
-  try {
-    result = JSON.parse(text);
-  } catch (err) {
-    throw new Error(`Could not parse Gemini JSON output: ${err.message}`);
-  }
+  const result = validateGenerationResult(parseStructuredJson(text, "Gemini"), { includeDesignProfile });
 
   return postProcessResult(result, {
     promptConfig,

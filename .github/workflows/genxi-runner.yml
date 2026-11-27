@@ -1,0 +1,121 @@
+name: Genxi runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "preview, live, collections, enqueue or queue-worker"
+        required: true
+        default: preview
+        type: choice
+        options: [preview, live, collections, enqueue, queue-worker]
+      confirm_live:
+        description: "Set true only for an owner-approved live Shopify run"
+        required: false
+        default: false
+        type: boolean
+      limit:
+        description: "Maximum products for this bounded run"
+        required: true
+        default: "10"
+        type: string
+      collection_handles:
+        description: "JSON array of lowercase collection handles for enqueue"
+        required: false
+        default: ""
+        type: string
+      enqueue_request_id:
+        description: "Stable idempotency key for enqueue"
+        required: false
+        default: ""
+        type: string
+      queue_mode:
+        description: "Queue write mode"
+        required: false
+        default: preview
+        type: choice
+        options: [preview, live]
+      published_from:
+        description: "Optional ISO publication-window start"
+        required: false
+        default: ""
+        type: string
+      published_before:
+        description: "Optional ISO publication-window end"
+        required: false
+        default: ""
+        type: string
+  schedule:
+    - cron: "10 3 * * *"
+
+concurrency:
+  group: genxi-runner
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+      SHOPIFY_CLIENT_ID: ${{ secrets.SHOPIFY_CLIENT_ID }}
+      SHOPIFY_CLIENT_SECRET: ${{ secrets.SHOPIFY_CLIENT_SECRET }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      GENXI_ALLOWANCE_STATUS: ${{ secrets.GENXI_ALLOWANCE_STATUS }}
+      GENXI_DAILY_ALLOWANCE_REQUESTS: ${{ secrets.GENXI_DAILY_ALLOWANCE_REQUESTS }}
+      GENXI_DAILY_ALLOWANCE_TOKENS: ${{ secrets.GENXI_DAILY_ALLOWANCE_TOKENS }}
+      GENXI_USAGE_REQUESTS: ${{ secrets.GENXI_USAGE_REQUESTS }}
+      GENXI_USAGE_TOKENS: ${{ secrets.GENXI_USAGE_TOKENS }}
+      GENXI_ALLOWANCE_EVIDENCE_FRESH: ${{ secrets.GENXI_ALLOWANCE_EVIDENCE_FRESH }}
+      GENXI_JOB_TIME_BUDGET_MINUTES: "320"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check allowance and safe-pause guards
+        id: allowance
+        run: node engine/lib/allowanceGuard.js
+      - name: Validate and run bounded Genxi worker
+        if: steps.allowance.outputs.allowed == 'true'
+        shell: bash
+        env:
+          # Scheduled invocations only drain the durable queue. They never
+          # promote an empty queue into an unapproved live run.
+          REQUESTED_MODE: ${{ github.event_name == 'schedule' && 'queue-worker' || inputs.mode }}
+          CONFIRM_LIVE: ${{ inputs.confirm_live || 'false' }}
+          RUN_LIMIT: ${{ inputs.limit || '10' }}
+          INPUT_COLLECTION_HANDLES: ${{ inputs.collection_handles || '' }}
+          INPUT_ENQUEUE_REQUEST_ID: ${{ inputs.enqueue_request_id || '' }}
+          INPUT_QUEUE_MODE: ${{ inputs.queue_mode || 'preview' }}
+          INPUT_PUBLISHED_FROM: ${{ inputs.published_from || '' }}
+          INPUT_PUBLISHED_BEFORE: ${{ inputs.published_before || '' }}
+        run: |
+          set -euo pipefail
+          if [[ "$REQUESTED_MODE" == "live" && "$CONFIRM_LIVE" != "true" ]]; then
+            echo "Live mode requires explicit confirm_live=true" >&2
+            exit 2
+          fi
+          args=("--mode=$REQUESTED_MODE" "--limit=$RUN_LIMIT")
+          # Live Shopify writes are never retried by the workflow. Preview and
+          # queue work may retry once for transient provider/runner failures;
+          # queue request IDs and CAS protect durable state from duplication.
+          if [[ "$REQUESTED_MODE" == "live" ]]; then
+            node engine/index.js "${args[@]}"
+          else
+            attempt=1
+            until node engine/index.js "${args[@]}"; do
+              if [[ "$attempt" -ge 2 ]]; then exit 1; fi
+              attempt=$((attempt + 1))
+              sleep 15
+            done
+          fi

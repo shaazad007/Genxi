@@ -7,6 +7,7 @@ const {
   normalizeDesignProfile,
   fingerprintProductContext,
 } = require("./designProfile");
+const { buildPakistaniFashionVocabularyPrompt } = require("./fashionVocabulary");
 
 /**
  * The single prompt used for the combined vision+copy request, shared by
@@ -99,6 +100,7 @@ DESCRIPTION_CONTENT fields: intro is the opening paragraph; design_summary cover
 
 HARD RULES (apply regardless of which structure above is used):
 - ${extra_rules}
+- ${buildPakistaniFashionVocabularyPrompt()}
 - Never use these overused phrases or close variants: ${bannedList}.
 - Do not repeat generic openings such as “This design”, “This outfit”, “This suit”, “The overall design”, or “The shirt features”. Lead with a verified colour, craft, silhouette, pattern, or distinctive detail when available.
 - Do not use generic superlatives, sales language, unsupported styling advice, or keyword stuffing.

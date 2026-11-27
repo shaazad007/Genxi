@@ -10,6 +10,7 @@ const { fetchImageAsBase64 } = require("./analyzer");
 const { findMatch } = require("./description");
 const { buildCombinedPromptText, postProcessResult } = require("./promptShared");
 const { fingerprintImages } = require("./designProfile");
+const { parseStructuredJson, validateGenerationResult } = require("./outputValidation");
 
 const CLOUDFLARE_BASE = "https://api.cloudflare.com/client/v4/accounts";
 const DEFAULT_CLOUDFLARE_MODEL = "@cf/qwen/qwen3.8-27b";
@@ -109,12 +110,7 @@ async function generateWithCloudflare({
     throw new Error(`Cloudflare Workers AI returned no content (finish_reason=${finishReason}, message_fields=${messageFields}).`);
   }
 
-  let result;
-  try {
-    result = JSON.parse(text);
-  } catch (err) {
-    throw new Error(`Could not parse Cloudflare Workers AI JSON output (finish_reason=${finishReason}, output_chars=${text.length}): ${err.message}`);
-  }
+  const result = validateGenerationResult(parseStructuredJson(text, "Cloudflare Workers AI"), { includeDesignProfile });
 
   return postProcessResult(result, {
     promptConfig,

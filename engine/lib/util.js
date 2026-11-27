@@ -72,13 +72,26 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+const DATA_URI = /data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=]+/gi;
+const HTTP_URL = /https?:\/\/[^\s<>"']+/gi;
+const LONG_ENCODED = /\b[A-Za-z0-9+/=_-]{160,}\b/g;
+const TOKEN = /\b(?:shpat|shpca|shpua|shppa)_[A-Za-z0-9_-]+\b/gi;
+
+function scrubText(value) {
+  return String(value == null ? "" : value)
+    .replace(DATA_URI, "[IMAGE_DATA_REDACTED]")
+    .replace(HTTP_URL, "[URL_REDACTED]")
+    .replace(TOKEN, "[TOKEN_REDACTED]")
+    .replace(LONG_ENCODED, "[ENCODED_DATA_REDACTED]");
+}
+
 /**
  * Very small structured logger. Prints to console (visible in the GitHub Actions
  * run log) and also returns the line so callers can push it into an in-memory
  * buffer that gets written to a log file for the dashboard.
  */
 function log(message) {
-  const line = `[${new Date().toTimeString().slice(0, 8)}] ${message}`;
+  const line = `[${new Date().toTimeString().slice(0, 8)}] ${scrubText(message)}`;
   console.log(line);
   return line;
 }
@@ -123,4 +136,5 @@ module.exports = {
   csvEscape,
   cleanText,
   truncate,
+  scrubText,
 };

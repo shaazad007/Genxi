@@ -3,7 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const { sleep, log, todayDateString, nowIso, csvEscape } = require("./util");
+const { sleep, log, todayDateString, nowIso, csvEscape, scrubText } = require("./util");
 const { generateProductContent } = require("./generate");
 const { generateWithGroq } = require("./groq");
 const { generateWithCloudflare } = require("./cloudflare");
@@ -29,7 +29,7 @@ function saveProgress(progressPath, progress) {
 }
 
 function appendFailedRow(failedCsvPath, row) {
-  const line = [row.product_id, row.title, row.handle, row.error, row.timestamp]
+  const line = [row.product_id, row.title, row.handle, scrubText(row.error), row.timestamp]
     .map(csvEscape)
     .join(",");
   fs.appendFileSync(failedCsvPath, line + "\n");
@@ -126,7 +126,7 @@ function writePreviewFile(previewDir, index, product, result) {
   const safeHandle = (product.handle || product.id).replace(/[^a-z0-9-]/gi, "_");
   const filePath = path.join(previewDir, `${String(index).padStart(2, "0")}-${safeHandle}.txt`);
 
-  const content = `PRODUCT: ${product.title}
+  const content = scrubText(`PRODUCT: ${product.title}
 URL HANDLE (unchanged): ${product.handle}
 TITLE: unchanged — this system never edits the product title
 --------------------------------------------------
@@ -144,7 +144,7 @@ ${result.design_profile ? JSON.stringify(result.design_profile, null, 2) : resul
 
 DESCRIPTION HTML:
 ${result.description_html}
-`;
+`);
   fs.writeFileSync(filePath, content);
 }
 
@@ -499,7 +499,7 @@ async function runBatch({ shopify, config, mode, limit, runLog, logicalJobId = "
             product_id: product.id,
             title: product.title,
             handle: product.handle,
-            error: err.message,
+            error: scrubText(err.message),
             timestamp: nowIso(),
           });
           if (onProductResult) await onProductResult({ productId: product.id, status: "failed", error: err.message });
@@ -589,4 +589,4 @@ async function runBatch({ shopify, config, mode, limit, runLog, logicalJobId = "
   return { processed, failed, stopReason, usedGroqCount, usedCloudflareCount };
 }
 
-module.exports = { runBatch };
+module.exports = { runBatch, writePreviewFile, appendFailedRow };

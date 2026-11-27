@@ -10,7 +10,11 @@
   },
   "scripts": {
     "start": "node index.js --mode=preview",
-    "preview": "node index.js --mode=preview"
+    "preview": "node index.js --mode=preview",
+    "test:prompt": "node --test ../tests/t013_fashion_prompt.test.cjs",
+    "test:output": "node --test ../tests/t014_output_validation.test.cjs",
+    "test:fallback": "node --test ../tests/t015_provider_fallback.test.cjs",
+    "test:scrub": "node --test ../tests/t016_storage_scrub.test.cjs"
   },
   "license": "UNLICENSED"
 }

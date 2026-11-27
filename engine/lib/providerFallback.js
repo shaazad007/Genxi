@@ -11,22 +11,31 @@ async function runProviderFallback(
     try {
       return { result: await provider.generate(), providerName: provider.name };
     } catch (providerErr) {
-      if (!providerErr.dailyQuotaExhausted &&
-          !providerErr.providerLimitReached && providerErr.status !== 429) {
+      const retryableProviderFailure = providerErr && (
+        providerErr.dailyQuotaExhausted ||
+        providerErr.providerLimitReached ||
+        providerErr.code === "INVALID_MODEL_OUTPUT" ||
+        providerErr.status === 408 ||
+        providerErr.status === 429 ||
+        providerErr.status >= 500
+      );
+      if (!retryableProviderFailure) {
         throw providerErr;
       }
       unavailableProviders.set(provider.name, providerErr);
       limitedProviders.push(providerErr);
       const reason = providerErr.dailyQuotaExhausted
         ? "daily quota exhausted"
-        : "rate limit reached";
+        : providerErr.providerLimitReached || providerErr.status === 429
+          ? "rate limit reached"
+          : providerErr.code === "INVALID_MODEL_OUTPUT"
+            ? "returned invalid structured output"
+            : "transient provider failure";
       onLimited(provider, providerErr, reason);
     }
   }
 
-  const cascadeErr = new Error(
-    "All configured image providers have exhausted their quota or rate limit.",
-  );
+  const cascadeErr = new Error("All configured image providers failed or reached their limits.");
   cascadeErr.providerCascadeExhausted = true;
   const exhaustedProviders = Array.from(unavailableProviders.values());
   cascadeErr.allDailyQuotas = exhaustedProviders.length > 0 &&

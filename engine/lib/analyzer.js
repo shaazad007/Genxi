@@ -15,6 +15,8 @@
  */
 
 const { retryWithBackoff, log } = require("./util");
+const { buildPakistaniFashionVocabularyPrompt } = require("./fashionVocabulary");
+const { parseStructuredJson, validateVisionResult } = require("./outputValidation");
 
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
@@ -46,6 +48,7 @@ Known context about this product (may be incomplete or slightly outdated — use
 
 STRICT RULES:
 - ${extra_rules}
+- ${buildPakistaniFashionVocabularyPrompt()}
 - If something is not clearly visible, DO NOT mention it or guess. Leave it out entirely — do not write "not visible" either, just omit the field/point.
 - Do not invent measurements, fabric names, materials, or technical specifications.
 - Respond in ${language || "English"}.
@@ -116,11 +119,7 @@ async function analyzeImages(apiKey, model, imageUrls, promptConfig, productCont
     throw new Error("Gemini returned no analyzable content (possibly blocked by safety filters).");
   }
 
-  try {
-    return JSON.parse(text);
-  } catch (err) {
-    throw new Error(`Could not parse Gemini vision JSON output: ${err.message}`);
-  }
+  return validateVisionResult(parseStructuredJson(text, "Gemini vision"));
 }
 
-module.exports = { analyzeImages, fetchImageAsBase64 };
+module.exports = { analyzeImages, buildVisionPrompt, fetchImageAsBase64 };
